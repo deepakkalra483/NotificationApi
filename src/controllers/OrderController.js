@@ -28,4 +28,26 @@ const placeOrder = async (req, res) => {
   // Send push notification
 };
 
-module.exports = { placeOrder };
+const orderReady = async (req, res) => {
+  const { token } = req?.body;
+  if (!token || token == "") {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required." });
+  }
+  try {
+    const notificationPayload = {
+      notification: {
+        title: "Your Order is Ready!",
+        body: `Please pick your order`,
+      },
+      token: token,
+    };
+    const response = await admin.messaging().send(notificationPayload);
+    res.status(200).json({ success: true, messageId: response });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error });
+  }
+};
+
+module.exports = { placeOrder, orderReady };
