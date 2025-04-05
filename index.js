@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const orderRoutes = require("./src/routes/OrderRoutes");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 app.use(cors());
 // Middleware
@@ -14,6 +14,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/orders", orderRoutes);
+
+app.get('/ping', (req, res) => {
+  res.status(200).send('Server is alive!');
+});
 
 // Start Server
 app.listen(port, () => {
