@@ -1,3 +1,4 @@
+const { json } = require("body-parser");
 const admin = require("../config/firebase");
 
 const placeOrder = async (req, res) => {
@@ -27,10 +28,18 @@ const placeOrder = async (req, res) => {
       data: orderDetails,
       tokens: tokens,
     };
-
+    console.log("detailss-", JSON.stringify(orderDetails));
     const response = await admin
       .messaging()
       .sendEachForMulticast(notificationPayload);
+    console.log("resposne--", JSON.stringify(response));
+    if (response.successCount === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "All messages failed to send",
+        error: response,
+      });
+    }
     res.status(200).json({ success: true, messageId: response });
   } catch (error) {
     return res.status(400).json({ success: false, message: error });
@@ -38,9 +47,8 @@ const placeOrder = async (req, res) => {
 
   // Send push notification
 };
-
 const orderReady = async (req, res) => {
-  const { token } = req?.body;
+  const { token, id, table } = req?.body;
   if (!token || token == "") {
     return res
       .status(400)
@@ -52,9 +60,13 @@ const orderReady = async (req, res) => {
         title: "Your Order is Ready!",
         body: `Please pick your order`,
       },
+      data: {
+        url: `https://finedine-5974a.web.app/?Id=${id}&&table=${table}`, // 🔥 Add your custom URL here
+      },
       token: token,
     };
     const response = await admin.messaging().send(notificationPayload);
+    console.log("respo--", JSON.stringify(response));
     res.status(200).json({ success: true, messageId: response });
   } catch (error) {
     return res.status(400).json({ success: false, message: error });
