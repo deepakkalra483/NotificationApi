@@ -1,0 +1,14 @@
+name: Keep Render Server Awake
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # Runs every 10 minutes
+  workflow_dispatch:          # Optional: allows manual run
+
+jobs:
+  ping-render-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Render Server
+        run: curl -s https://notificationapi-zwf4.onrender.com/ping
